@@ -16,6 +16,11 @@
 
 
     <script>
+        let beginDate;
+
+        let daysAhead;
+
+        let vue;
         $(document).ready(function () {
             dataToUpdate = {}
             checkCurrentUser();
@@ -88,23 +93,23 @@
           </div>
     </div>
 
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17/vue.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/vue.js'></script>
 
     <!-- 2. Link VCalendar Javascript (Plugin automatically installed) -->
     <script src='https://unpkg.com/v-calendar'></script>
 
     <!--3. Create the Vue instance-->
     <script>
-        let daysAhead = 29
-        const beginDate = new Date()
-        beginDate.setDate(beginDate.getDate() + daysAhead)
+        let daysAheads = 30
+                beginDate = new Date()
+                beginDate.setDate(beginDate.getDate() + daysAheads)
 
-        const beginDateAvbl = new Date()
-        beginDateAvbl.setDate(beginDateAvbl.getDate() + daysAhead + 1)
+                const beginDateAvbl = new Date()
+                beginDateAvbl.setDate(beginDateAvbl.getDate() + daysAheads + 1)
 
         const endDate = new Date("2023-01-31")
 
-        let vue = new Vue({
+        vue = new Vue({
             el: "#app",
             data() {
                 return {
@@ -137,6 +142,7 @@
                         this.days.splice(idx, 1);
                     } else {
 
+                        if (this.days.length < 24){
 
                         (day.date > beginDate && day.date < endDate) ?  //TODO: colocar na variavel global
 
@@ -144,6 +150,7 @@
                                 id: day.id,
                                 date: day.date,
                             }) : {}
+                        }
                     }
                 },
             },
@@ -203,6 +210,22 @@
                         }
 
                     }
+
+
+            curatedHouse = (`${element["curated"]}` === 'true')
+            if (curatedHouse) {
+                daysAhead = 0
+            } else {
+                daysAhead = 30
+            }
+
+            startDate = new Date()
+            startDate.setDate(startDate.getDate() + daysAhead + 1)  
+            vue.$data.avbldates[0].start = startDate
+
+            beginDate = new Date()
+            beginDate.setDate(beginDate.getDate() + daysAhead)
+
                     $('html, body').css({
                         overflow: 'auto',
                         height: 'auto'
@@ -225,7 +248,7 @@
         function formsRequest() {
 
             var objForm = dataToUpdate
-            console.log(dataToUpdate)
+            
             $('html, body').css({
                 overflow: 'hidden',
                 height: '100%'
