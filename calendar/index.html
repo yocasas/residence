@@ -78,6 +78,9 @@
             <!-- Add a column to display info for clicked day -->
             <div v-if='days' class='selected-day'>
                 <div class="hidden" id="days_list">{{ days }}</div>
+                <div class="hidden" id="removeDays_list">{{ removeDays }}</div>
+
+
 
                 <!-- <ul>
             <li v-for='day in days' :key='day.highlight'>
@@ -88,9 +91,10 @@
         </div>
         <div class="flex justify-center md:justify-end py-4">
             <a onClick="formsRequest();" href="#"
-              class=" inline-flex next_step_1 hover:border-green_detail hover:bg-green_detail hover:bg- bg-green_light px-8 py-2 rounded-full  border-8 border-green_light  text-green_dark  items-center">Adicionar datas
-              </a>
-          </div>
+                class=" inline-flex next_step_1 hover:border-green_detail hover:bg-green_detail hover:bg- bg-green_light px-8 py-2 rounded-full  border-8 border-green_light  text-green_dark  items-center">Adicionar
+                datas
+            </a>
+        </div>
     </div>
 
     <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/vue.js'></script>
@@ -101,11 +105,11 @@
     <!--3. Create the Vue instance-->
     <script>
         let daysAheads = 30
-                beginDate = new Date()
-                beginDate.setDate(beginDate.getDate() + daysAheads)
+        beginDate = new Date()
+        beginDate.setDate(beginDate.getDate() + daysAheads)
 
-                const beginDateAvbl = new Date()
-                beginDateAvbl.setDate(beginDateAvbl.getDate() + daysAheads + 1)
+        const beginDateAvbl = new Date()
+        beginDateAvbl.setDate(beginDateAvbl.getDate() + daysAheads + 1)
 
         const endDate = new Date("2023-01-31")
 
@@ -115,6 +119,7 @@
                 return {
                     selectedDay: null, // Add state to store selected day
                     days: [],
+                    removeDays: new Set(),
                     avbldates: [{ start: beginDateAvbl, end: endDate }] //TODO: Puxar do back as datas disponiveis
                     //["2021-09-16T03:00:00.000Z"]
                 };
@@ -137,19 +142,27 @@
             },
             methods: {
                 onDayClick(day) {
+                    
                     const idx = this.days.findIndex(d => d.id === day.id);
                     if (idx >= 0) {
+                        this.removeDays.add(day.id);
                         this.days.splice(idx, 1);
                     } else {
 
-                        if (this.days.length < 24){
+                        if (this.days.length < 24) {
 
-                        (day.date > beginDate && day.date < endDate) ?  //TODO: colocar na variavel global
+                            if (day.date > beginDate && day.date < endDate) {  //TODO: colocar na variavel global
 
-                            this.days.push({
-                                id: day.id,
-                                date: day.date,
-                            }) : {}
+                                this.days.push({
+                                    id: day.id,
+                                    date: day.date,
+                                })
+
+                                this.removeDays.delete(day.id);
+                            } else {
+                                { }
+                            }
+
                         }
                     }
                 },
@@ -212,19 +225,19 @@
                     }
 
 
-            curatedHouse = (`${element["curated"]}` === 'true')
-            if (curatedHouse) {
-                daysAhead = 0
-            } else {
-                daysAhead = 30
-            }
+                    curatedHouse = (`${element["curated"]}` === 'true')
+                    if (curatedHouse) {
+                        daysAhead = 0
+                    } else {
+                        daysAhead = 30
+                    }
 
-            startDate = new Date()
-            startDate.setDate(startDate.getDate() + daysAhead + 1)  
-            vue.$data.avbldates[0].start = startDate
+                    startDate = new Date()
+                    startDate.setDate(startDate.getDate() + daysAhead + 1)
+                    vue.$data.avbldates[0].start = startDate
 
-            beginDate = new Date()
-            beginDate.setDate(beginDate.getDate() + daysAhead)
+                    beginDate = new Date()
+                    beginDate.setDate(beginDate.getDate() + daysAhead)
 
                     $('html, body').css({
                         overflow: 'auto',
@@ -248,7 +261,7 @@
         function formsRequest() {
 
             var objForm = dataToUpdate
-            
+
             $('html, body').css({
                 overflow: 'hidden',
                 height: '100%'
@@ -259,7 +272,11 @@
             var daysObjectList = JSON.parse($("#days_list").html())
             var daysList = daysObjectList.map(a => a.id);
 
+            var removeDaysObjectList = Array.from(vue.removeDays)
+
             objForm["availableDates"] = daysList
+            objForm["removeDates"] = removeDaysObjectList
+
 
             var tokens = authCookie.split(".");
             // console.log(atob(tokens[0])); //Alg, Type
@@ -272,33 +289,33 @@
             data = JSON.stringify(objForm)
 
             $.ajax({
-            url: "https://of5h69nvm8.execute-api.us-east-1.amazonaws.com/dev/addHome",
-            type: 'POST',
-            data: data,
-            headers: {
-              'Authorization': authCookie,
-            },
-            "contentType": "application/json",
-            success: function (data1, textStatus, jqXHR) {
-              $('html, body').css({
-                overflow: 'auto',
-                height: 'auto'
-              });
-              $(".loading").parent().addClass('hidden')
-              window.location.href = "https://yocasas.com.br/home/";
+                url: "https://of5h69nvm8.execute-api.us-east-1.amazonaws.com/dev/addHome",
+                type: 'POST',
+                data: data,
+                headers: {
+                    'Authorization': authCookie,
+                },
+                "contentType": "application/json",
+                success: function (data1, textStatus, jqXHR) {
+                    $('html, body').css({
+                        overflow: 'auto',
+                        height: 'auto'
+                    });
+                    $(".loading").parent().addClass('hidden')
+                    window.location.href = "/home";
 
 
 
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-              $('html, body').css({
-                overflow: 'auto',
-                height: 'auto'
-              });
-              $(".loading").parent().addClass('hidden')
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('html, body').css({
+                        overflow: 'auto',
+                        height: 'auto'
+                    });
+                    $(".loading").parent().addClass('hidden')
 
-            },
-          })
+                },
+            })
         }
     </script>
 
