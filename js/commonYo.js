@@ -59,7 +59,9 @@ function getCookie(name) {
 
 
 let checkCurrentUser = function () {
-
+    if (getCookie("dev_mode_enable") != null && getCookie("dev_mode_enable") != undefined && getCookie("dev_mode_enable")=="yes") {
+        devMode = true
+    }
     let myCookie = getCookie("login_session");
 
     authCookie = myCookie
@@ -157,7 +159,11 @@ function getUserPoints() {
 
         //TODO: Usar os headers e nao clientid como argumento
         data = JSON.stringify(data)
+        let getUserUri = "https://044er6jwuc.execute-api.us-east-1.amazonaws.com/dev-2/getuser"
 
+          if (devMode) {
+            getUserUri = "https://wuixd5ec4b.execute-api.us-east-2.amazonaws.com/DEV/getuser"
+          }
         $.ajax({
             url: "https://044er6jwuc.execute-api.us-east-1.amazonaws.com/dev-2/getuser",
             type: 'POST',
