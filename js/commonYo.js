@@ -165,7 +165,7 @@ function getUserPoints() {
             getUserUri = "https://wuixd5ec4b.execute-api.us-east-2.amazonaws.com/DEV/getuser"
           }
         $.ajax({
-            url: "https://044er6jwuc.execute-api.us-east-1.amazonaws.com/dev-2/getuser",
+            url: getUserUri,
             type: 'POST',
             data: data,
             headers: {
