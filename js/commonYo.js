@@ -12,6 +12,14 @@ function changeUserName(element) {
     element.text(clientInfo.nickName)
 }
 
+function checkDevMode() {
+
+    if (sessionStorage.getItem("devMode") == "yes" || document.location.hostname == "localhost" || document.location.hostname == "dev.yocasas.com.br" ) {
+      devMode = true
+    }
+  
+    return devMode
+  }
 
 
 function traduzirLocation(location, tiny) {
@@ -60,9 +68,9 @@ function getCookie(name) {
 
 
 let checkCurrentUser = function () {
-    if (getCookie("dev_mode_enable") != null && getCookie("dev_mode_enable") != undefined && getCookie("dev_mode_enable")=="yes") {
-        devMode = true
-    }
+    
+    checkDevMode()
+
     let myCookie = getCookie("login_session");
 
     authCookie = myCookie
@@ -131,6 +139,7 @@ let starsToPointsPerNight = function (multiplier) {
 
 
 function getUserPoints() {
+    checkDevMode()
     token = authCookie
     return new Promise((resolve, reject) => {
 
